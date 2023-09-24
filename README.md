@@ -25,6 +25,19 @@ Stores all of the sound, from the music to the projectiles to the explosions. No
 # storage
 Stores the previous iterations of the game, since I didn't know what git was back then and that was my best substitute.
 
+# the game
+
+**factions**
+There are 2 factions - the purple faction (that's yours) and the whitey-orangey?? faction. Shoot at each other.
+
+**Ships**:
+The purple faction has 2 ships, plus another that never made it since development of the game stopped. 
+
+-Standard ship: This is the ship you start as. Space to fire, enter to fire a self-guided rocket at the last enemy damaged (or random if none).
+-Annorax ship: 
+
+(readme still being worked on, I had to go)
+
 
 
 
