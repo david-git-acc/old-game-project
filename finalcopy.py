@@ -30,19 +30,19 @@ buffList = [] # Tracks all buffs
 BOOM = [] #Tracks all explosions
 mineList = [] #...
 healthCall = 0 #tracks which ship will go for health boost
-score = 250000#853223000
+score = 0#853223000
 enemyKills = 0
 minerKills = 0
 frigateKills = 0
 spacing = 30
-currentLives = 3
+currentLives = -50
 lifeSpacing = 58
 purchasingTimeDelay = 5
 purchasingTimeDelayTimer = 0
 stationSpacing = 100
 timingVar = 0
 
-enemyChoice = 0
+enemyChoice = 1
 alliedChoice = 0
 
 alliedTeam = ["Player ship" , "Friendly"]
@@ -140,11 +140,13 @@ littleShoot = pygame.mixer.Sound("sound/littleShoot.ogg")
 powerUpEffect = pygame.mixer.Sound("sound/powerUpEffect.ogg")
 shipExplosionFX = pygame.mixer.Sound("sound/shipExplosionFX.ogg")
 musicTracks = ["sound/brainiacManiac8Bit.ogg",
-               "sound/8BitDreamscape.ogg",
                "sound/mountainTrials.ogg",
                "sound/friendlyFaithPlate.ogg",
                "sound/trappedInABox.ogg",
-               "sound/Powerup! (music).ogg","sound/underClocked.ogg","sound/Shiny Tech II comp REDUCED.ogg","sound/blipStream.ogg"]
+               "sound/Powerup! (music).ogg",
+               "sound/underClocked.ogg",
+               "sound/Shiny Tech II comp REDUCED.ogg",
+               "sound/blipStream.ogg"]
 musicSelection = copy.deepcopy(musicTracks)
 explosionSoundFX2 = pygame.mixer.Sound("sound/explosionSoundFX2.ogg")
 
@@ -677,8 +679,8 @@ class ship():
 
         if self.healthRegenTime >= 1:
             self.healthRegenTime -= 1
-            if self.health + 0.4 <= self.orgHealth and self.health != 0:
-                self.health += 0.4
+            if self.health + 0.75 <= self.orgHealth and self.health != 0:
+                self.health += 0.75
 
         if self.fireBoost > 0:
             self.fireBoost -= 1
@@ -863,7 +865,9 @@ class ship():
 
             
 
-            for o in [a for a in objectList if not isinstance(a, spaceStation) and not isinstance(a, shield) and not isinstance(a,fighter)]:  
+            for o in [a for a in objectList 
+                      if not isinstance(a, spaceStation) and not isinstance(a, shield) and not isinstance(a,fighter) 
+                      and a.name != self.name]:  
 
 
 
@@ -1541,8 +1545,8 @@ class beam():
         self.height = 8
         self.side = side
         self.speed = 64 * self.side
-        self.damage = 5
-        self.critChance = 25
+        self.damage = 4
+        self.critChance = 0
         self.owner = owner
         self.ownerID = ownerID
         self.aliveTimer = 165
@@ -1969,12 +1973,12 @@ class spaceStation():
 
 class malevolent(spaceStation):
     def __init__(self,name,width,height,x,y,health,orgHealth,mitigation,projectiles,horProjectiles,healthRecovery):
-        super().__init__("Enemy ship",128,128,random.randint(250,winWidth - width - 150),random.randint(150,winHeight - height - 150),2350,2350,0.75,[],[],12)
+        super().__init__("Enemy ship",128,128,random.randint(250,winWidth - width - 150),random.randint(150,winHeight - height - 150),1850,1850,0.7,[],[],12)
 
         self.torpedoTimer = 135
         self.beamTimer = 60
         self.secondBeamTimer = 0
-        self.launchTimer = 0
+        self.launchTimer = 350
         self.secondTorpTimer = 0
         self.attackTargets = 0
         self.numberOfTimesFired = 0
@@ -2015,7 +2019,7 @@ class malevolent(spaceStation):
         if self.launchTimer <= 0:
             for x in range(5):
                 objectList.append(fighter(1,1,1,self.x+48+ random.randint(-45,45),self.y+46+ random.randint(-45,45),1,1,1,1,1,1,1,1,1,1))
-            self.launchTimer = 1050
+            self.launchTimer = 1250
 
         if self.beamTimer <= 0:
             self.secondBeamTimer -= 1
@@ -2150,7 +2154,7 @@ class friendly(spaceStation):
 
 class enemy(ship):
     def __init__(self,name,width,height,x,y,health,orgHealth,mitigation,speed,projectiles,left,right,up,down,healthRecovery):
-        super().__init__("Enemy ship",64,64,random.randint(50,winWidth),random.randint(50,winHeight+height),150,150,0.45,6,[],[],False,False,True,False,0,16)
+        super().__init__("Enemy ship",64,64,random.randint(50,winWidth),random.randint(50,winHeight+height),150,150,0.4,6,[],[],False,False,True,False,0,16)
 
         self.suicideExplosionTimer = 150 #timer for suiciding enemy ships to hit the player before they are destroyed
         self.torpTimer = random.randint(0,263)
@@ -2685,12 +2689,12 @@ class enemy(ship):
 
 class carrier(ship):
     def __init__(self,name,width,height,x,y,health,orgHealth,mitigation,speed,projectiles,left,right,up,down,healthRecovery):
-        super().__init__("Enemy ship",96,96,random.randint(150,winWidth-150),random.randint(150,winHeight-150),850,850,0.55,2,[],[],False,False,True,False,0,24)
+        super().__init__("Enemy ship",96,96,random.randint(150,winWidth-150),random.randint(150,winHeight-150),700,700,0.5,2,[],[],False,False,True,False,0,24)
 
         self.fighterTimer = 0
         self.fighterList = []
         self.torpTimer = 28
-        self.tolerance = 87
+        self.tolerance = 87 
 
     def draw(self,window):
         self.counter += 1
@@ -2883,7 +2887,7 @@ class carrier(ship):
 
 class fighter(ship):
     def __init__(self,name,width,height,x,y,health,orgHealth,mitigation,speed,projectiles,left,right,up,down,healthRecovery):
-        super().__init__("EnemyS",32,32,x,y,32,32,0.15,11,[],[],False,False,True,False,0,28)
+        super().__init__("EnemyS",32,32,x,y,30,30,0.15,11,[],[],False,False,True,False,0,28)
 
         self.shootingTimer = 16
         self.fired = 0
@@ -3310,7 +3314,7 @@ class fighter(ship):
 
 class frigate(ship):
     def __init__(self,name,width,height,x,y,health,orgHealth,mitigation,speed,projectiles,left,right,up,down,healthRecovery):
-        super().__init__("EnemyS",48,48,random.randint(50,winWidth),random.randint(50,winHeight),48,48,0.25,5,[],[],False,False,True,False,0,28)
+        super().__init__("EnemyS",48,48,random.randint(50,winWidth),random.randint(50,winHeight),50,50,0.25,5,[],[],False,False,True,False,0,28)
 
         self.target = 0
         self.tolerance = 35
@@ -3343,7 +3347,7 @@ class frigate(ship):
             self.counter = 0
 
     def fireGuns(self):
-        if len(self.projectiles) + len(self.horProjectiles) <= 1:
+        if len(self.projectiles) + len(self.horProjectiles) <= 3:
             #Only fires if total number of projectiles <= 4
             if self.up:
                 projBullet = enemyProjectile(self.x+self.width/2-1, self.y-5,-1,self.name,self )
@@ -3997,7 +4001,7 @@ class shield():
 
 class enemyS(shield):
     def __init__(self,name,x,y,orientation,actualWidth,actualHeight,health,orgHealth,healthRecovery,orgHealthRecovery,owner):
-        super().__init__("EnemyS",x,y,orientation,150,150,220,220,420,420,owner)
+        super().__init__("EnemyS",x,y,orientation,150,150,320,320,440,440,owner)
 
         self.animCounter = 0
 
@@ -4015,7 +4019,7 @@ class enemyS(shield):
 
 class friendlyS(shield):
     def __init__(self, name , x , y , orientation, actualWidth,  actualHeight, health,orgHealth,healthRecovery,orgHealthRecovery,owner):
-        super().__init__("Friendly",x,y,orientation,16,119,100,100,360,360,owner)
+        super().__init__("Friendly",x,y,orientation,16,119,150,150,360,360,owner)
 
         self.animCounter = 0
 
@@ -4158,9 +4162,9 @@ class enemyProjectile():
             self.critChance = 10
 
         if self.ownerID.amplified > 0:
-            self.speed *= 1.75
-            self.damage *= 1.75
-            self.critChance *= 1.75
+            self.speed *= 1.5
+            self.damage *= 1.5
+            self.critChance *= 1.5
 
 
     #Drawing the projectiles vertically
@@ -4210,9 +4214,9 @@ class powerfulProjectile():
         self.aliveTimer = 165
 
         if self.ownerID.amplified > 0:
-            self.speed *= 1.75
-            self.damage *= 1.75
-            self.critChance *= 1.75
+            self.speed *= 1.5
+            self.damage *= 1.5
+            self.critChance *= 1.5
 
         
 
@@ -4550,7 +4554,7 @@ class healthPowerUp(powerUp):
 
         for o in [a for a in objectList if isinstance(a,ship)]:
             if math.hypot(o.x-self.x,o.y-self.y) < 45 and o.health != o.orgHealth:
-                o.healthRegenTime += 500
+                o.healthRegenTime += 1000
                 o.damagedCount = 500
                 o.health += 40 + 0.5 * o.orgHealth
                 if o.name in alliedTeam:
@@ -4734,9 +4738,9 @@ class torpedo():
             self.critChance = 15
 
         if self.ownerID.amplified > 0:
-            self.speed *= 1.75
-            self.damage *= 1.75
-            self.critChance *= 1.75
+            self.speed *= 1.5
+            self.damage *= 1.5
+            self.critChance *= 1.5
 
     def draw(self,window):
 
@@ -4784,9 +4788,9 @@ class rocket():
         self.performanceCheck = 0
 
         if self.ownerID.amplified > 0:
-            self.speed *= 1.75
-            self.damage *= 1.75
-            self.critChance *= 1.75
+            self.speed *= 1.5
+            self.damage *= 1.5
+            self.critChance *= 1.5
 
     def draw(self,window):
 
@@ -4890,9 +4894,9 @@ class projectile():
         self.aliveTimer = 165
 
         if self.ownerID.amplified > 0:
-            self.speed *= 1.75
-            self.damage *= 1.75
-            self.critChance *= 1.75
+            self.speed *= 1.5
+            self.damage *= 1.5
+            self.critChance *= 1.5
 
     #VERTICAL PROJECTILES
     def draw(self,window):
@@ -4940,12 +4944,16 @@ playing = False
 # MAINLOOP
 station = 693
 running = True
-while running:
+while running: 
     clock.tick(30)
     #pygame.event.set_allowed([QUIT, KEYDOWN, KEYUP])
     for event in pygame.event.get():
         if event.type == pygame.QUIT: #If the quit button is pressed
             running = False
+            
+    # if currentLives <= 0:
+    #     break
+        
             
     if not pygame.mixer.music.get_busy():
         if len(musicSelection) != 0:
@@ -5011,18 +5019,19 @@ while running:
     if count == 1:
         for x in range(random.randint(0,enemyChoice)):
             objectList.append(miner(1,1,1,1,1,1,1,1,1,1,1,1,1,1,1))
-        for x in range(random.randint(0,enemyChoice)):
+        for x in range(random.randint(0,enemyChoice//5)):
             objectList.append(enemy(1,1,1,1,1,1,1,1,1,1,1,1,1,1,1))
         for x in range(random.randint(0,enemyChoice)):
             objectList.append(frigate(1,1,1,1,1,1,1,1,1,1,1,1,1,1,1))
-        for x in range(random.randint(0,enemyChoice//9)):
+        for x in range(random.randint(0,enemyChoice//15)):
             aBigCarrier = carrier(1,1,1,1,1,1,1,1,1,1,1,1,1,1,1)
             objectList.append(aBigCarrier)
-        for x in range(random.randint(0,enemyChoice//45)):
-            evilStation = malevolent(1,1,1,1,1,1,1,1,1,1,1)
-            someShield = enemyS(1,evilStation.x-6,evilStation.y-6,1,1,1,1,1,1,1,evilStation)
-            objectList.append(evilStation)
-            objectList.append(someShield)
+        if enemyChoice % 4 == 0:
+            for x in range(random.randint(0,enemyChoice//35)):
+                evilStation = malevolent(1,1,1,1,1,1,1,1,1,1,1)
+                someShield = enemyS(1,evilStation.x-6,evilStation.y-6,1,1,1,1,1,1,1,evilStation)
+                objectList.append(evilStation)
+                objectList.append(someShield)
 
         enemyChoice += 1
 
@@ -5046,27 +5055,27 @@ while running:
 
 
 
-    # if count2 == 0: #If player is destroyed, respawns them
-    #     for x in range(random.randint(0,alliedChoice)):
-    #         objectList.append(playerN(1,1,1,1,1,1,1,1,1,1,1,1,1,1,1))
-    #     for x in range(random.randint(0,alliedChoice )):
-    #         objectList.append(annoraxN(1,1,1,1,1,1,1,1,1,1,1,1,1,1,1))
-    #     for x in range(random.randint(0,alliedChoice//24)):
-    #         aPurchasedStation = friendly(1,1,1,1,1,1,1,1,1,1,1)
-    #         objectList.append(aPurchasedStation)
-    #         shieldUp1 = friendlyS(1,aPurchasedStation.x,aPurchasedStation.y-24,0,1,1,1,1,1,1,aPurchasedStation)
-    #         objectList.append(shieldUp1)
+    if count2 == 0: #If player is destroyed, respawns them
+        for x in range(random.randint(0,alliedChoice)):
+            objectList.append(playerN(1,1,1,1,1,1,1,1,1,1,1,1,1,1,1))
+        for x in range(random.randint(0,alliedChoice )):
+            objectList.append(annoraxN(1,1,1,1,1,1,1,1,1,1,1,1,1,1,1))
+        for x in range(random.randint(0,alliedChoice//24)):
+            aPurchasedStation = friendly(1,1,1,1,1,1,1,1,1,1,1)
+            objectList.append(aPurchasedStation)
+            shieldUp1 = friendlyS(1,aPurchasedStation.x,aPurchasedStation.y-24,0,1,1,1,1,1,1,aPurchasedStation)
+            objectList.append(shieldUp1)
 
-    #         shieldRight1 = friendlyS(1,aPurchasedStation.x+aPurchasedStation.width+4,aPurchasedStation.y,1,1,1,1,1,1,1,aPurchasedStation)
-    #         objectList.append(shieldRight1)
+            shieldRight1 = friendlyS(1,aPurchasedStation.x+aPurchasedStation.width+4,aPurchasedStation.y,1,1,1,1,1,1,1,aPurchasedStation)
+            objectList.append(shieldRight1)
 
-    #         shieldDown1 = friendlyS(1,aPurchasedStation.x,aPurchasedStation.y+aPurchasedStation.height,2,1,1,1,1,1,1,aPurchasedStation)
-    #         objectList.append(shieldDown1)
+            shieldDown1 = friendlyS(1,aPurchasedStation.x,aPurchasedStation.y+aPurchasedStation.height,2,1,1,1,1,1,1,aPurchasedStation)
+            objectList.append(shieldDown1)
 
-    #         shieldLeft1 = friendlyS(1,aPurchasedStation.x-20,aPurchasedStation.y,3,1,1,1,1,1,1,aPurchasedStation)
-    #         objectList.append(shieldLeft1)
+            shieldLeft1 = friendlyS(1,aPurchasedStation.x-20,aPurchasedStation.y,3,1,1,1,1,1,1,aPurchasedStation)
+            objectList.append(shieldLeft1)
 
-    #     alliedChoice += 1
+        alliedChoice += 1
 
 
 
@@ -5087,7 +5096,7 @@ while running:
         if o.health <= 0:
             BOOM.append(shipExploding(o.x,o.y))
             if isinstance(o, enemy):
-                score += 1500
+                score += 2000
                 enemyKills += 1
             elif isinstance(o, frigate):
                 score+= 500
@@ -5096,11 +5105,11 @@ while running:
                 score += 500
                 minerKills += 1
             elif isinstance(o, carrier):
-                score += 7500
+                score += 8000
             elif isinstance(o, fighter):
                 score += 250
             elif isinstance(o,malevolent):
-                score += 30000
+                score += 50000
             elif (isinstance(o, player) or isinstance(o, annoraxPlayable)) and currentLives > 0:
                 currentLives -= 1
             objectList.remove(o)  
@@ -5145,9 +5154,9 @@ while running:
 
                                 if o.health > p.damage and criticalStrike == 0:
                                     #If the object has more hp than the projectile has damage
-                                
+                                    
                                     overallDamage = p.damage + random.randint(-1,1)
-                                    overallDamage = int(overallDamage * mitigation) #Has to account for mitigation
+                                    overallDamage = int(math.ceil(overallDamage * mitigation)) #Has to account for mitigation
                                     currentHealth = o.health
                                     o.health -= overallDamage   #Damages the object
                                     if isinstance(p.ownerID,player):
@@ -5157,7 +5166,7 @@ while running:
                                     o.damagedCount = 100 #Displays the healthbar for 100 ticks 
                                 elif o.health > p.damage * 1.5 and criticalStrike == 1: #ON CASE OF CRITICAL STRIKE - All critical hits deal 50% more damage
                                     overallDamage = int(p.damage * 1.5 + random.randint(-1,1))
-                                    overallDamage = int(overallDamage * mitigation) #Same as above
+                                    overallDamage = int(math.ceil(overallDamage * mitigation)) #Same as above
                                     currentHealth = o.health
                                     o.health -= overallDamage #Same as above
                                     if o.name in enemyTeam:
@@ -5258,5 +5267,5 @@ if score > highScore:
 
 
 
-
+print(f"You made it to round {enemyChoice}")
 pygame.quit() #This is the end
