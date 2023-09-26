@@ -1104,7 +1104,7 @@ class annoraxN(ship):
         self.rememberCoordinates = 0
         self.rememberTimer = 0
         self.timer = 24
-        self.annoraxBeamTimer = 0
+        self.annoraxBeamTimer = 1000
         self.slowDownRate = 0.92
         self.slowDownTime = 36
         self.shootTimer = 75
